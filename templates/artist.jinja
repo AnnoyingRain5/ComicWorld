@@ -1,0 +1,30 @@
+{% extends 'base.jinja' %}
+
+{% block content %}
+    <h1>{% block title %} {{ artist }}'s page {% endblock %}</h1>
+    {% if showimages != 1 %}
+    <a href="?showimages=1">show images?</a>
+    {% else %}
+    <a href="?showimages=0"> stop showing images?</a>
+    {% endif %}
+    <hr>
+    {% for comic in comics %}
+        <a href="{{ url_for('comic', comic_id=comic['id']) }}">
+            <h2>{{ comic['title'] }}</h2>
+        </a>
+        <span class="badge badge-primary">{{ comic['created'] }}</span>
+        <a href="{{ url_for('edit', id=comic['id']) }}">
+            <span class="badge badge-warning">Edit</span>
+        </a>
+
+        {% if showimages == 1 %}
+            <br>
+            <br>
+            <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}", style="max-width: 50%;">
+            <br>
+            <br>
+        {% endif %}
+
+        <hr>
+    {% endfor %}
+{% endblock %}
