@@ -1,14 +1,20 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
-    <h1>{% block title %} {{ artist }}'s page {% endblock %}</h1>
-    {% if showimages != 1 %}
-    <a href="?showimages=1">show images?</a>
-    {% else %}
-    <a href="?showimages=0"> stop showing images?</a>
-    {% endif %}
-    <hr>
+<div class="center">
+    <div class="notepad">
+        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
+        <h1>{% block title %} {{ artist }}'s page {% endblock %}</h1>
+        {% if showimages != 1 %}
+        <a href="?showimages=1">show images?</a>
+        {% else %}
+        <a href="?showimages=0"> stop showing images?</a>
+        {% endif %}
+    </div>
+</div>
+<div class="notecontainer">
     {% for comic in comics %}
+    <div class="sticky {{['s1','s2', 's3', 's4']|random}}">
         <a href="{{ url_for('comic', comic_id=comic['id']) }}">
             <h2>{{ comic['title'] }}</h2>
         </a>
@@ -16,15 +22,12 @@
         <a href="{{ url_for('edit', id=comic['id']) }}">
             <span class="badge badge-warning">Edit</span>
         </a>
-
         {% if showimages == 1 %}
-            <br>
-            <br>
-            <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}", style="max-width: 50%;">
-            <br>
-            <br>
+        <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}">
         {% endif %}
-
-        <hr>
+    </div>
     {% endfor %}
+    <!-- This fake element is only here to ensure that the final sticky isn't forced to be an extra row down -->
+    <div style="visibility:hidden; height:0px; width: 20em"></div>
+</div>
 {% endblock %}

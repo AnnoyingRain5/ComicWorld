@@ -1,0 +1,51 @@
+.s1{
+    background-color:#ffbcd9;
+    transform:rotate(1deg);
+}
+
+.s1::before{
+    border-color: #d8a2ab transparent;
+}
+
+.s1::after{
+    border-color: #ffbcd9;
+}
+
+.s2{
+    background-color:lightblue;
+    transform:rotate(3deg);
+}
+
+.s2::before{
+    border-color: #89b6c4 transparent;
+}
+
+.s2::after{
+    border-color: lightblue;
+}
+
+.s3{
+    transform:rotate(-1deg);
+    background-color:#fff968;
+}
+
+.s3::before{
+    border-color: #ddd756 transparent;
+}
+
+.s3::after{
+    border-color: #fff968;
+}
+
+.s4{
+    transform:rotate(-3deg);
+    background-color:#68dd7c;
+}
+
+.s4::before{
+    border-color: #68bb56 transparent;
+}
+
+.s4::after{
+    border-color: #68dd7c;
+}

@@ -1,11 +1,22 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
-    <h1>{% block title %} Welcome to ComicWorld {% endblock %}</h1>
+<div class="center">
+    <div class="notepad">
+        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
+        <h1>{% block title %} Artists: {% endblock %}</h1>
+    </div>
+</div>
+
+<div class="notecontainer">
     {% for artist in artists %}
+    <div class="sticky {{['s1','s2', 's3', 's4']|random}}">
         <a href="{{ url_for('artistpage', artist=artist[0]) }}">
             <h2>{{ artist[0] }}</h2>
         </a>
-        <hr>
+    </div>
     {% endfor %}
+    <!-- This fake element is only here to ensure that the final sticky isn't forced to be an extra row down -->
+    <div style="visibility:hidden; height:0px; width: 20em"></div>
+</div>
 {% endblock %}

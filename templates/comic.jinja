@@ -1,8 +1,12 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
-    <h2>{% block title %} {{ comic['title'] }} {% endblock %}</h2>
-    <span class="badge badge-primary">{{ comic['created'] }}</span>
-    <br>
-    <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}", style="max-width: 100%;">
+<div class="notecontainer">
+    <div class="sticky {{['s1','s2', 's3', 's4']|random}}" style="width: 50%">
+        <h2>{% block title %} {{ comic['title'] }} {% endblock %}</h2>
+        <span class="badge badge-primary">{{ comic['created'] }}</span>
+        <br>
+        <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}">
+    </div>
+</div>
 {% endblock %}
