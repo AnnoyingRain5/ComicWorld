@@ -124,23 +124,26 @@ def create():
         if file and allowed_file(file.filename):
             if not title:
                 flash("Title is required!")
+                return redirect(request.url)
             else:
                 # actually add to the database
                 cur = conn.cursor()
                 cur.execute(
                     "INSERT INTO comics (title, fileext, artistid) VALUES (?, ?, ?)",
-                    (title, secure_filename(file.filename.split(".")[-1]), artist[1]),
+                    (title, secure_filename(file.filename.split(".")[-1]), artist[1]),  # type: ignore
                 )
                 conn.commit()
-                filename = (
-                    f"{cur.lastrowid}.{secure_filename(file.filename.split('.')[-1])}"
-                )
+                filename = f"{cur.lastrowid}.{secure_filename(file.filename.split('.')[-1])}"  # type: ignore
                 file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
                 cur.close()
                 conn.close()
                 return redirect(url_for("index"))
-
-    elif request.method == "GET":
+        else:
+            flash(
+                "You either did not attach a file, or the file extension was not allowed."
+            )
+            return redirect(request.url)
+    else:
         return render_template("create.jinja")
 
 
