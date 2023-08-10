@@ -1,7 +1,7 @@
 import sqlite3
 from werkzeug.security import generate_password_hash
 
-connection = sqlite3.connect('database.db')
+connection = sqlite3.connect('db/database.db')
 code = input("code: ")
 
 with open('schema.sql') as f:
