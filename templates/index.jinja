@@ -21,8 +21,9 @@
             <h2>{{ comic['title'] }}</h2>
         </a>
         <span class="badge badge-primary">{{ comic['created'] }}</span>
-        <a href="/artists/{{artists[comic['artistid']]}}"><span class="badge badge-primary">{{
-                artists[comic['artistid']] }}</span></a>
+        <a href="/artists/{{artists[comic['artistid']]}}">
+            <span class="badge badge-primary">{{artists[comic['artistid']] }}</span>
+        </a>
         <a href="{{ url_for('edit', id=comic['id']) }}">
             <span class="badge badge-warning">Edit</span>
         </a>
