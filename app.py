@@ -54,7 +54,7 @@ app.config["UPLOAD_FOLDER"] = "static/comics"
 @app.route("/")
 def index():
     conn = get_db_connection()
-    comics = conn.execute("SELECT * FROM comics").fetchall()
+    comics = conn.execute("SELECT * FROM comics ORDER BY created DESC").fetchall()
     artists = conn.execute("SELECT id, username FROM artists").fetchall()
     conn.close()
     artistdict = {}
@@ -81,7 +81,7 @@ def artistpage(artist):
         "SELECT id FROM artists WHERE username = ?", (artist,)
     ).fetchone()
     comics = conn.execute(
-        "SELECT * FROM comics WHERE artistid = ?", (artist_id[0],)
+        "SELECT * FROM comics WHERE artistid = ? ORDER BY created DESC", (artist_id[0],)
     ).fetchall()
     conn.close()
     print(request.args.get("showimages", type=int))
