@@ -22,11 +22,9 @@
         </a>
         <span class="badge badge-primary">{{ comic['created'] }}</span>
         <a href="/artists/{{artists[comic['artistid']]}}">
-            <span class="badge badge-primary">{{artists[comic['artistid']] }}</span>
-        </a>
+            <span class="badge badge-primary">{{artists[comic['artistid']] }}</span></a>
         <a href="{{ url_for('edit', id=comic['id']) }}">
-            <span class="badge badge-warning">Edit</span>
-        </a>
+            <span class="badge badge-warning">Edit</span></a>
         {% if showimages == 1 %}
         <a href="{{ url_for('comic', comic_id=comic['id']) }}">
             <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}">
