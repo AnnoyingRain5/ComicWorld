@@ -3,11 +3,16 @@
 {% block content %}
 <div class="center">
     <div class="notecontainer">
-        <div class="sticky {{['s1','s2', 's3', 's4']|random}}" style="margin-right: auto; width: fit-content; height: fit-content; transform: rotate(0deg);">
+        <div class="sticky {{['s1','s2', 's3', 's4']|random}}"
+            style="margin-right: auto; width: fit-content; height: fit-content; transform: rotate(0deg);">
             <h2>{% block title %} {{ comic['title'] }} {% endblock %}</h2>
             <span class="badge badge-primary">{{ comic['created'] }}</span>
+            <a href="/artists/{{artist}}">
+                <span class="badge badge-primary">{{ artist }}</span>
+            </a>
             <br>
-            <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}" style="object-fit: contain; height: 69vh; width:70w; border-radius: 10px;">
+            <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}"
+                style="object-fit: contain; height: 69vh; width:70w; border-radius: 10px;">
         </div>
     </div>
 </div>

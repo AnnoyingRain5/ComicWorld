@@ -71,7 +71,11 @@ def index():
 @app.route("/<int:comic_id>")
 def comic(comic_id):
     comic = get_comic(comic_id)
-    return render_template("comic.jinja", comic=comic)
+    conn = get_db_connection()
+    artist = conn.execute(
+        "SELECT username FROM artists WHERE id = ?", (comic[4],)
+    ).fetchone()
+    return render_template("comic.jinja", comic=comic, artist=artist[0])
 
 
 @app.route("/artists/<string:artist>")
