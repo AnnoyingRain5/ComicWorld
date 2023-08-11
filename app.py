@@ -54,17 +54,23 @@ app.config["UPLOAD_FOLDER"] = "static/comics"
 @app.route("/")
 def index():
     conn = get_db_connection()
-    comics = conn.execute("SELECT * FROM comics ORDER BY created DESC").fetchall()
+    page = request.args.get("page", type=int)
+    if page is None:
+        page = 0
+    else:
+        page -= 1
+    offset = page * 50
+    comics = conn.execute(
+        "SELECT * FROM comics ORDER BY created DESC LIMIT 50 OFFSET ?",
+        (offset,),
+    ).fetchall()
     artists = conn.execute("SELECT id, username FROM artists").fetchall()
     conn.close()
     artistdict = {}
     for artist in artists:
         artistdict.update({artist[0]: artist[1]})
     return render_template(
-        "index.jinja",
-        comics=comics,
-        artists=artistdict,
-        showimages=request.args.get("showimages", type=int),
+        "index.jinja", comics=comics, artists=artistdict, page=page + 1
     )
 
 
@@ -81,11 +87,18 @@ def comic(comic_id):
 @app.route("/artists/<string:artist>")
 def artistpage(artist):
     conn = get_db_connection()
+    page = request.args.get("page", type=int)
+    if page is None:
+        page = 0
+    else:
+        page -= 1
+    offset = page * 50
     artist_id = conn.execute(
         "SELECT id FROM artists WHERE username = ?", (artist,)
     ).fetchone()
     comics = conn.execute(
-        "SELECT * FROM comics WHERE artistid = ? ORDER BY created DESC", (artist_id[0],)
+        "SELECT * FROM comics WHERE artistid = ? ORDER BY created DESC LIMIT 50 OFFSET ?",
+        (artist_id[0], offset),
     ).fetchall()
     conn.close()
     print(request.args.get("showimages", type=int))
@@ -93,7 +106,7 @@ def artistpage(artist):
         "artist.jinja",
         artist=artist,
         comics=comics,
-        showimages=request.args.get("showimages", type=int),
+        page=page+1
     )
 
 
