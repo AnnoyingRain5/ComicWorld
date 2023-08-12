@@ -59,18 +59,33 @@ def index():
         page = 0
     else:
         page -= 1
+    # pages are 50 items long
     offset = page * 50
+    # request one more comic than we need, purely to see if it exists
     comics = conn.execute(
-        "SELECT * FROM comics ORDER BY created DESC LIMIT 50 OFFSET ?",
+        "SELECT * FROM comics ORDER BY created DESC LIMIT 51 OFFSET ?",
         (offset,),
     ).fetchall()
+    # if there are more comics, allow going to the next page
+    # and clean up the extra comic
+    if len(comics) > 50:
+        comics.pop()
+        allownext = True
+    else:
+        # if not, do not allow going to the next page
+        allownext = False
     artists = conn.execute("SELECT id, username FROM artists").fetchall()
     conn.close()
+    # convert the artist to a dict for easy searching
     artistdict = {}
     for artist in artists:
         artistdict.update({artist[0]: artist[1]})
     return render_template(
-        "index.jinja", comics=comics, artists=artistdict, page=page + 1
+        "index.jinja",
+        comics=comics,
+        artists=artistdict,
+        page=page + 1,
+        allownext=allownext,
     )
 
 
@@ -97,16 +112,21 @@ def artistpage(artist):
         "SELECT id FROM artists WHERE username = ?", (artist,)
     ).fetchone()
     comics = conn.execute(
-        "SELECT * FROM comics WHERE artistid = ? ORDER BY created DESC LIMIT 50 OFFSET ?",
+        "SELECT * FROM comics WHERE artistid = ? ORDER BY created DESC LIMIT 51 OFFSET ?",
         (artist_id[0], offset),
     ).fetchall()
     conn.close()
+    # if there are more comics, allow going to the next page
+    # and clean up the extra comic
+    if len(comics) > 50:
+        comics.pop()
+        allownext = True
+    else:
+        # if not, do not allow going to the next page
+        allownext = False
     print(request.args.get("showimages", type=int))
     return render_template(
-        "artist.jinja",
-        artist=artist,
-        comics=comics,
-        page=page+1
+        "artist.jinja", artist=artist, comics=comics, page=page + 1, allownext=allownext
     )
 
 

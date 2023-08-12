@@ -28,7 +28,7 @@
 </div>
 
 <div class="linkbar">
-    {% if page - 1 > 0 %} <a href="?page={{page - 1}}">Previous Page</a> | {% endif %}<a
-        href="?page={{page + 1}}">Next Page</a>
+    {% if page - 1 > 0 %} <a href="?page={{page - 1}}">Previous Page</a>{% endif %}{% if page - 1 > 0 and allownext%} |
+    {% endif %}{% if allownext %}<a href="?page={{page + 1}}">Next Page</a> {% endif %}
 </div>
 {% endblock %}
