@@ -5,6 +5,8 @@
     <div class="notepad">
         <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
         <h1>{% block title %} Welcome to ComicWorld {% endblock %}</h1>
+        {% if page - 1 > 0 %} <a href="?page={{page - 1}}">Previous Page</a>{% endif %}{% if page - 1 > 0 and allownext%} |
+        {% endif %}{% if allownext %}<a href="?page={{page + 1}}">Next Page</a> {% endif %}
     </div>
 </div>
 <div class="notecontainer">
