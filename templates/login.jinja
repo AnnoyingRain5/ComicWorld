@@ -3,20 +3,16 @@
 <div class="center">
     <div class="notepad">
         <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
-        <h1>{% block title %} Upload a new comic {% endblock %}</h1>
+        <h1>{% block title %} Artist's Login {% endblock %}</h1>
         <form method="post" enctype=multipart/form-data>
             <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" name="title" placeholder="Post title" class="form-control"
-                    value="{{ request.form['title'] }}">
+                <label for="username">Username</label>
+                <input type="text" name="username" placeholder="Username" class="form-control"
+                    value="{{ request.form['username'] }}">
             </div>
-
             <div class="form-group">
-                <label for="image">Image</label>
-                <div class="upload-btn-wrapper">
-                    <button class="btn">Upload your comic!</button>
-                    <input type="file" id="image" name="image" accept="image/*">
-                </div>
+                <label for="password">Password</label>
+                <input type="password" name="password" placeholder="Password" class="form-control">
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>
