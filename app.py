@@ -15,6 +15,7 @@ import os
 from dotenv import load_dotenv
 from functools import wraps
 import jwt
+from flask_sitemapper import Sitemapper
 from datetime import datetime, timedelta
 import upgrade_db
 
@@ -113,12 +114,15 @@ if os.getenv("SECRET_KEY") is None:
     print("invalid config!")
     exit()
 
+sitemapper = Sitemapper()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["UPLOAD_FOLDER"] = "static/comics"
 app.config["MAX_LOGIN_TIME"] = int(maxlogintime)
+sitemapper.init_app(app)
 
 
+@sitemapper.include()
 @app.route("/")
 @check_token()
 def index(login_artist: Artist | None):
@@ -227,6 +231,7 @@ def testauth(artist):
     return f"artist: {artist[2]}"
 
 
+@sitemapper.include()
 @app.route("/login", methods=["GET", "POST"])
 @check_token()
 def login(login_artist: Artist | None):
@@ -277,6 +282,7 @@ def logout():
     return resp
 
 
+@sitemapper.include()
 @app.route("/artists")
 @check_token()
 def artists(login_artist: Artist | None):
@@ -285,13 +291,17 @@ def artists(login_artist: Artist | None):
     conn.close()
     return render_template("artists.jinja", artists=artists, login_artist=login_artist)
 
+
+@sitemapper.include()
 @app.route("/series")
 @check_token()
 def series_list(login_artist: Artist | None):
     conn = get_db_connection()
     series = conn.execute("SELECT * FROM series").fetchall()
     conn.close()
-    return render_template("series_list.jinja", series_list=series, login_artist=login_artist)
+    return render_template(
+        "series_list.jinja", series_list=series, login_artist=login_artist
+    )
 
 
 @app.route("/series/<string:seriesName>")
@@ -345,14 +355,16 @@ def series(login_artist: Artist | None, seriesName: str):
 def create_series(login_artist: Artist):
     if request.method == "POST":
         conn = get_db_connection()
-        test = conn.execute("SELECT name FROM series WHERE name = ?", (request.form['name'],)).fetchone()
+        test = conn.execute(
+            "SELECT name FROM series WHERE name = ?", (request.form["name"],)
+        ).fetchone()
         if test is not None:
             # there is already a series with this name
             flash("There is already a series with this name!")
             return redirect("/create_series")
         conn.execute(
             "INSERT INTO series (name, artistid) VALUES (?, ?)",
-            (request.form["name"],login_artist.id),
+            (request.form["name"], login_artist.id),
         )
         conn.commit()
         conn.close()
@@ -386,7 +398,8 @@ def create(login_artist: Artist):
             else:
                 cur = conn.cursor()
                 artistid = cur.execute(
-                    "SELECT artistid FROM series WHERE name = ?", (request.form["series"],)
+                    "SELECT artistid FROM series WHERE name = ?",
+                    (request.form["series"],),
                 ).fetchone()[0]
                 # if artistid is None, allow anyone to post to the series
                 if login_artist.id != artistid and artistid is not None:
@@ -418,17 +431,22 @@ def create(login_artist: Artist):
         conn.close()
         return render_template("create.jinja", series=series, login_artist=login_artist)
 
+
 @app.route("/series/<string:SeriesName>/edit", methods=("GET", "POST"))
 @check_token(required=True)
 def edit_series(login_artist: Artist, SeriesName):
     if request.method == "POST":
         conn = get_db_connection()
-        test = conn.execute("SELECT name FROM series WHERE name = ?", (request.form['name'],)).fetchone()
+        test = conn.execute(
+            "SELECT name FROM series WHERE name = ?", (request.form["name"],)
+        ).fetchone()
         if test is not None:
             # there is already a series with this name
             flash("There is already a series with this name!")
             return redirect("/edit_series")
-        artistid = conn.execute("SELECT artistid FROM series WHERE name = ?", (SeriesName,)).fetchone()[0]
+        artistid = conn.execute(
+            "SELECT artistid FROM series WHERE name = ?", (SeriesName,)
+        ).fetchone()[0]
         if artistid != login_artist.id:
             flash("You cannot edit other people's series!")
             return redirect("/series")
@@ -441,7 +459,10 @@ def edit_series(login_artist: Artist, SeriesName):
         flash("Series updated!")
         return redirect(f"/series")
     else:
-        return render_template("edit_series.jinja", login_artist=login_artist, SeriesName=SeriesName)
+        return render_template(
+            "edit_series.jinja", login_artist=login_artist, SeriesName=SeriesName
+        )
+
 
 @app.route("/series/<string:SeriesName>/delete", methods=("POST",))
 @check_token(required=True)
@@ -459,6 +480,7 @@ def delete_series(login_artist: Artist, SeriesName):
     conn.close()
     flash("Series deleted!")
     return redirect(url_for("index"))
+
 
 @app.route("/<int:id>/edit", methods=("GET", "POST"))
 @check_token(required=True)
@@ -504,6 +526,7 @@ def edit(login_artist: Artist, id):
     )
 
 
+@sitemapper.include()
 @app.route("/create_account", methods=("GET", "POST"))
 @check_token()
 def create_account(login_artist: Artist):
@@ -557,3 +580,8 @@ def delete(login_artist: Artist, id):
     conn.close()
     flash('"{}" was successfully deleted!'.format(comic["title"]))
     return redirect(url_for("index"))
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return sitemapper.generate()
