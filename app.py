@@ -428,6 +428,10 @@ def edit_series(login_artist: Artist, SeriesName):
             # there is already a series with this name
             flash("There is already a series with this name!")
             return redirect("/edit_series")
+        artistid = conn.execute("SELECT artistid FROM series WHERE name = ?", (SeriesName,)).fetchone()[0]
+        if artistid != login_artist.id:
+            flash("You cannot edit other people's series!")
+            return redirect("/series")
         conn.execute(
             "UPDATE series SET (name) = (?) WHERE name = ?",
             (request.form["name"], SeriesName),
@@ -435,7 +439,7 @@ def edit_series(login_artist: Artist, SeriesName):
         conn.commit()
         conn.close()
         flash("Series updated!")
-        return redirect(f"/series/{SeriesName}")
+        return redirect(f"/series")
     else:
         return render_template("edit_series.jinja", login_artist=login_artist, SeriesName=SeriesName)
 
