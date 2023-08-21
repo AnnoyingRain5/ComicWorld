@@ -1,0 +1,19 @@
+{% extends 'base.jinja' %}
+{% block content %}
+<div class="center">
+    <div class="notepad">
+        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
+        <h1>{% block title %} Create a new series {% endblock %}</h1>
+        <form method="post" enctype=multipart/form-data>
+            <div class="form-group">
+                <label for="name">Series name</label>
+                <input type="text" name="name" placeholder="Series Name" class="form-control"
+                    value="{{ request.form['name'] }}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

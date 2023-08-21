@@ -1,0 +1,24 @@
+{% extends 'base.jinja' %}
+
+{% block content %}
+<div class="center">
+    <div class="notepad">
+        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
+        <h1>{% block title %} Series: {% endblock %}</h1>
+    </div>
+</div>
+
+<div class="notecontainer">
+    {% for series in series_list %}
+    <div class="sticky {{['s1','s2', 's3', 's4']|random}}">
+        <a href="{{ url_for('series', seriesName=series[1]) }}">
+            <h2>{{ series[1] }}</h2>
+        </a>
+        <a href="{{ url_for('edit_series', SeriesName=series[1]) }}">
+            <span class="badge badge-warning">Edit</span></a>
+    </div>
+    {% endfor %}
+    <!-- This fake element is only here to ensure that the final sticky isn't forced to be an extra row down -->
+    <div style="visibility:hidden; height:0px; width: 20em"></div>
+</div>
+{% endblock %}

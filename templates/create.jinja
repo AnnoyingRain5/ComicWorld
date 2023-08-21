@@ -15,10 +15,19 @@
                 <div class="upload-btn-wrapper">
                     <button class="btn">Choose a file</button>
                     <br>
-                    <img id="preview" width="50%" style="padding-top: 5%"/>
+                    <img id="preview" width="50%" style="padding-top: 5%" />
                     <input type="file" id="image" name="image" accept="image/*"
                         onchange="document.getElementById('preview').src = window.URL.createObjectURL(this.files[0])">
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="series">Series</label>
+                <select name="series" id="series" , style="width: 175px">
+                    <option value="None">No series</option>
+                    {% for series_name in series %}
+                    <option value="{{series_name[0]}}">{{series_name[0]}}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>

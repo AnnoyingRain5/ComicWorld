@@ -16,6 +16,9 @@ from dotenv import load_dotenv
 from functools import wraps
 import jwt
 from datetime import datetime, timedelta
+import upgrade_db
+
+upgrade_db.upgrade_if_needed()
 
 load_dotenv()
 
@@ -141,15 +144,22 @@ def index(login_artist: Artist | None):
         # if not, do not allow going to the next page
         allownext = False
     artists = conn.execute("SELECT id, username FROM artists").fetchall()
-    conn.close()
     # convert the artist to a dict for easy searching
     artistdict = {}
     for other_artist in artists:
         artistdict.update({other_artist[0]: other_artist[1]})
+
+    series_db = conn.execute("SELECT id, name FROM series").fetchall()
+    seriesdict = {}
+    # convert the series to a dict for easy searching
+    for series in series_db:
+        seriesdict.update({series[0]: series[1]})
+    conn.close()
     return render_template(
         "index.jinja",
         comics=comics,
         artists=artistdict,
+        series=seriesdict,
         page=page + 1,
         allownext=allownext,
         login_artist=login_artist,
@@ -186,6 +196,11 @@ def artistpage(login_artist, artist):
         "SELECT * FROM comics WHERE artistid = ? ORDER BY created DESC LIMIT 51 OFFSET ?",
         (artist_id[0], offset),
     ).fetchall()
+    series_db = conn.execute("SELECT id, name FROM series").fetchall()
+    seriesdict = {}
+    # convert the series to a dict for easy searching
+    for series in series_db:
+        seriesdict.update({series[0]: series[1]})
     conn.close()
     # if there are more comics, allow going to the next page
     # and clean up the extra comic
@@ -195,13 +210,13 @@ def artistpage(login_artist, artist):
     else:
         # if not, do not allow going to the next page
         allownext = False
-    print(request.args.get("showimages", type=int))
     return render_template(
         "artist.jinja",
         artist=artist,
         comics=comics,
         page=page + 1,
         allownext=allownext,
+        series=seriesdict,
         login_artist=login_artist,
     )
 
@@ -250,13 +265,17 @@ def login(login_artist: Artist | None):
     )
     return resp
 
+
 @app.route("/logout")
 def logout():
     flash("Logged out, this did not invalidate your token!")
-    flash("This means, if you were infected by malware, you'll need to contact AnnoyingRains!")
+    flash(
+        "This means, if you were infected by malware, you'll need to contact AnnoyingRains!"
+    )
     resp = make_response(redirect(url_for("index")))
     resp.set_cookie("token", "")
     return resp
+
 
 @app.route("/artists")
 @check_token()
@@ -265,6 +284,82 @@ def artists(login_artist: Artist | None):
     artists = conn.execute("SELECT username FROM artists").fetchall()
     conn.close()
     return render_template("artists.jinja", artists=artists, login_artist=login_artist)
+
+@app.route("/series")
+@check_token()
+def series_list(login_artist: Artist | None):
+    conn = get_db_connection()
+    series = conn.execute("SELECT * FROM series").fetchall()
+    conn.close()
+    return render_template("series_list.jinja", series_list=series, login_artist=login_artist)
+
+
+@app.route("/series/<string:seriesName>")
+@check_token()
+def series(login_artist: Artist | None, seriesName: str):
+    conn = get_db_connection()
+    page = request.args.get("page", type=int)
+    if page is None:
+        page = 0
+    else:
+        page -= 1
+    offset = page * 50
+    seriesID = conn.execute(
+        "SELECT id FROM series WHERE name = ?", (seriesName,)
+    ).fetchone()
+    if seriesID is None:
+        flash("Invaid Series!")
+        return redirect("/series")
+    seriesID = seriesID[0]
+    comics = conn.execute(
+        "SELECT * FROM comics WHERE seriesid = ? ORDER BY created DESC LIMIT 51 OFFSET ?",
+        (seriesID, offset),
+    ).fetchall()
+    artists = conn.execute("SELECT id, username FROM artists").fetchall()
+    # convert the artist to a dict for easy searching
+    artistdict = {}
+    for other_artist in artists:
+        artistdict.update({other_artist[0]: other_artist[1]})
+    conn.close()
+    # if there are more comics, allow going to the next page
+    # and clean up the extra comic
+    if len(comics) > 50:
+        comics.pop()
+        allownext = True
+    else:
+        # if not, do not allow going to the next page
+        allownext = False
+    return render_template(
+        "series.jinja",
+        artist=seriesName,
+        comics=comics,
+        page=page + 1,
+        allownext=allownext,
+        login_artist=login_artist,
+        artists=artistdict,
+    )
+
+
+@app.route("/create_series", methods=("GET", "POST"))
+@check_token()
+def create_series(login_artist: Artist):
+    if request.method == "POST":
+        conn = get_db_connection()
+        test = conn.execute("SELECT name FROM series WHERE name = ?", (request.form['name'],)).fetchone()
+        if test is not None:
+            # there is already a series with this name
+            flash("There is already a series with this name!")
+            return redirect("/create_series")
+        conn.execute(
+            "INSERT INTO series (name, artistid) VALUES (?, ?)",
+            (request.form["name"],login_artist.id),
+        )
+        conn.commit()
+        conn.close()
+        flash("Series created! You can now publish comics to it!")
+        return redirect("/")
+    else:
+        return render_template("create_series.jinja", login_artist=login_artist)
 
 
 @app.route("/create", methods=("GET", "POST"))
@@ -289,11 +384,21 @@ def create(login_artist: Artist):
                 flash("Title is required!")
                 return redirect(request.url)
             else:
-                # actually add to the database
                 cur = conn.cursor()
+                artistid = cur.execute(
+                    "SELECT artistid FROM series WHERE name = ?", (request.form["series"],)
+                ).fetchone()[0]
+                # if artistid is None, allow anyone to post to the series
+                if login_artist.id != artistid and artistid is not None:
+                    flash("You cannot add your comic to someone else's series!")
+                    return redirect("/create")
+                # actually add to the database
+                seriesid = cur.execute(
+                    "SELECT id FROM series WHERE name = ?", (request.form["series"],)
+                ).fetchone()[0]
                 cur.execute(
-                    "INSERT INTO comics (title, fileext, artistid) VALUES (?, ?, ?)",
-                    (title, secure_filename(file.filename.split(".")[-1]), login_artist.id),  # type: ignore
+                    "INSERT INTO comics (title, fileext, artistid, seriesid) VALUES (?, ?, ?, ?)",
+                    (title, secure_filename(file.filename.split(".")[-1]), login_artist.id, seriesid),  # type: ignore
                 )
                 conn.commit()
                 filename = f"{cur.lastrowid}.{secure_filename(file.filename.split('.')[-1])}"  # type: ignore
@@ -307,8 +412,49 @@ def create(login_artist: Artist):
             )
             return redirect(request.url)
     else:
-        return render_template("create.jinja", login_artist=login_artist)
+        conn = get_db_connection()
+        series = conn.execute("SELECT name FROM series").fetchall()
+        conn.commit()
+        conn.close()
+        return render_template("create.jinja", series=series, login_artist=login_artist)
 
+@app.route("/series/<string:SeriesName>/edit", methods=("GET", "POST"))
+@check_token(required=True)
+def edit_series(login_artist: Artist, SeriesName):
+    if request.method == "POST":
+        conn = get_db_connection()
+        test = conn.execute("SELECT name FROM series WHERE name = ?", (request.form['name'],)).fetchone()
+        if test is not None:
+            # there is already a series with this name
+            flash("There is already a series with this name!")
+            return redirect("/edit_series")
+        conn.execute(
+            "UPDATE series SET (name) = (?) WHERE name = ?",
+            (request.form["name"], SeriesName),
+        )
+        conn.commit()
+        conn.close()
+        flash("Series updated!")
+        return redirect(f"/series/{SeriesName}")
+    else:
+        return render_template("edit_series.jinja", login_artist=login_artist, SeriesName=SeriesName)
+
+@app.route("/series/<string:SeriesName>/delete", methods=("POST",))
+@check_token(required=True)
+def delete_series(login_artist: Artist, SeriesName):
+    conn = get_db_connection()
+    artistid = conn.execute(
+        "SELECT artistid FROM series WHERE name = ?", (SeriesName,)
+    ).fetchone()[0]
+    if login_artist.id == artistid:
+        conn.execute("DELETE FROM series WHERE name = ?", (SeriesName,))
+    else:
+        flash("You can't delete other people's series!")
+        return redirect(url_for("index"))
+    conn.commit()
+    conn.close()
+    flash("Series deleted!")
+    return redirect(url_for("index"))
 
 @app.route("/<int:id>/edit", methods=("GET", "POST"))
 @check_token(required=True)
@@ -324,14 +470,34 @@ def edit(login_artist: Artist, id):
                 "SELECT artistid FROM comics WHERE id = ?", (id,)
             ).fetchone()[0]
             if login_artist.id == artistid:
-                conn.execute("UPDATE comics SET title = ?" " WHERE id = ?", (title, id))
+                # all checks passed, update the database
+                if request.form["series"] != "None":
+                    seriesid = conn.execute(
+                        "SELECT id FROM series WHERE name = ?",
+                        (request.form["series"],),
+                    ).fetchone()[0]
+                    conn.execute(
+                        "UPDATE comics SET (title, seriesid) = (?, ?)" " WHERE id = ?",
+                        (title, seriesid, id),
+                    )
+                else:
+                    # this comic is not in a series
+                    conn.execute(
+                        "UPDATE comics SET (title, seriesid) = (?, ?)" " WHERE id = ?",
+                        (title, None, id),
+                    )
             else:
                 flash("You can't edit other people's comics!")
             conn.commit()
             conn.close()
             return redirect(url_for("index"))
-
-    return render_template("edit.jinja", comic=comic, login_artist=login_artist)
+    conn = get_db_connection()
+    series = conn.execute("SELECT name FROM series").fetchall()
+    conn.commit()
+    conn.close()
+    return render_template(
+        "edit.jinja", comic=comic, series=series, login_artist=login_artist
+    )
 
 
 @app.route("/create_account", methods=("GET", "POST"))

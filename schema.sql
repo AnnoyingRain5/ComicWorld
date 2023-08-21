@@ -1,6 +1,9 @@
 DROP TABLE IF EXISTS comics;
 DROP TABLE IF EXISTS artists;
 DROP TABLE IF EXISTS codes;
+DROP TABLE IF EXISTS series;
+
+PRAGMA user_version = 2;
 
 CREATE TABLE artists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,18 +13,29 @@ CREATE TABLE artists (
     isadmin BOOLEAN NOT NULL
 );
 
+CREATE TABLE series (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    artistid INTEGER NOT NULL,
+    FOREIGN KEY (artistid)
+        REFERENCES artists(id),
+);
+
 CREATE TABLE comics (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     title TEXT NOT NULL,
     fileext TEXT NOT NULL,
     artistid INTEGER NOT NULL,
+    seriesid INTEGER,
     FOREIGN KEY (artistid)
-        REFERENCES artists(id)
+        REFERENCES artists(id),
+    FOREIGN KEY (seriesid)
+        REFERENCES series(id)
 );
 
 CREATE TABLE codes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT NOT NULL,
     expired BOOLEAN NOT NULL
-)
+);

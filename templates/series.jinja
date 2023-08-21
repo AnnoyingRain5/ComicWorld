@@ -4,7 +4,7 @@
 <div class="center">
     <div class="notepad">
         <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
-        <h1>{% block title %} {{ artist }}'s page {% endblock %}</h1>
+        <h1>{% block title %} Series: '{{ artist }}' {% endblock %}</h1>
         {% if page - 1 > 0 %} <a href="?page={{page - 1}}">Previous Page</a>{% endif %}{% if page - 1 > 0 and
         allownext%} |
         {% endif %}{% if allownext %}<a href="?page={{page + 1}}">Next Page</a> {% endif %}
@@ -17,11 +17,9 @@
         <a href="{{ url_for('comic', comic_id=comic['id']) }}">
             <h2>{{ comic['title'] }}</h2>
         </a>
-        {% if comic['seriesid'] %}
-        <span class="badge badge-primary">From series: <a
-                href="/series/{{series[comic['seriesid']]}}">{{series[comic['seriesid']] }}</a></span>
+        <span class="badge badge-primary">Created by: <a href="/artists/{{artists[comic['artistid']]}}">{{
+                artists[comic['artistid']] }}</a></span>
         <br>
-        {% endif %}
         <span class="badge badge-primary">{{ comic['created'] }}</span>
         <a href="{{ url_for('edit', id=comic['id']) }}">
             <span class="badge badge-warning">Edit</span></a>
