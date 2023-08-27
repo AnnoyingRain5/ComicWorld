@@ -18,6 +18,7 @@ import jwt
 from flask_sitemapper import Sitemapper
 from datetime import datetime, timedelta
 import upgrade_db
+import mimetypes
 
 upgrade_db.upgrade_if_needed()
 
@@ -169,6 +170,31 @@ def index(login_artist: Artist | None):
         login_artist=login_artist,
     )
 
+@app.route("/feed")
+def indexrssfeed():
+    conn = get_db_connection()
+    comics = conn.execute(
+        "SELECT * FROM comics ORDER BY created DESC").fetchall()
+    series_db = conn.execute("SELECT id, name FROM series").fetchall()
+    seriesdict = {}
+    # convert the series to a dict for easy searching
+    for series in series_db:
+        seriesdict.update({series[0]: series[1]})
+    artists = conn.execute("SELECT id, username FROM artists").fetchall()
+    # convert the artist to a dict for easy searching
+    artistdict = {}
+    for other_artist in artists:
+        artistdict.update({other_artist[0]: other_artist[1]})
+    conn.close()
+    response = make_response(render_template(
+        "rss/index.jinja",
+        comics=comics,
+        series=seriesdict,
+        artists=artistdict,
+        types_map=mimetypes.types_map
+    ))
+    response.headers['Content-Type'] = 'application/xml'
+    return response
 
 @app.route("/<int:comic_id>")
 @check_token()
@@ -223,6 +249,39 @@ def artistpage(login_artist, artist):
         series=seriesdict,
         login_artist=login_artist,
     )
+
+
+@app.route("/artists/<string:artist>/feed")
+def artistrssfeed(artist):
+    conn = get_db_connection()
+    artist_id = conn.execute(
+        "SELECT id FROM artists WHERE username = ?", (artist,)
+    ).fetchone()
+    comics = conn.execute(
+        "SELECT * FROM comics WHERE artistid = ? ORDER BY created DESC",
+        (artist_id[0],),
+    ).fetchall()
+    series_db = conn.execute("SELECT id, name FROM series").fetchall()
+    seriesdict = {}
+    # convert the series to a dict for easy searching
+    for series in series_db:
+        seriesdict.update({series[0]: series[1]})
+    artists = conn.execute("SELECT id, username FROM artists").fetchall()
+    # convert the artist to a dict for easy searching
+    artistdict = {}
+    for other_artist in artists:
+        artistdict.update({other_artist[0]: other_artist[1]})
+    conn.close()
+    response = make_response(render_template(
+        "rss/artist.jinja",
+        artist=artist,
+        comics=comics,
+        series=seriesdict,
+        artists=artistdict,
+        types_map=mimetypes.types_map
+    ))
+    response.headers['Content-Type'] = 'application/xml'
+    return response
 
 
 @app.route("/testauth")
@@ -341,7 +400,7 @@ def series(login_artist: Artist | None, seriesName: str):
         allownext = False
     return render_template(
         "series.jinja",
-        artist=seriesName,
+        seriesName=seriesName,
         comics=comics,
         page=page + 1,
         allownext=allownext,
@@ -349,6 +408,37 @@ def series(login_artist: Artist | None, seriesName: str):
         artists=artistdict,
     )
 
+@app.route("/series/<string:seriesName>/feed")
+def seriesrssfeed(seriesName):
+    conn = get_db_connection()
+    series_id = conn.execute(
+        "SELECT id FROM series WHERE name = ?", (seriesName,)
+    ).fetchone()
+    comics = conn.execute(
+        "SELECT * FROM comics WHERE seriesid = ? ORDER BY created DESC",
+        (series_id[0],),
+    ).fetchall()
+    artists = conn.execute("SELECT id, username FROM artists").fetchall()
+    # convert the artist to a dict for easy searching
+    artistdict = {}
+    for other_artist in artists:
+        artistdict.update({other_artist[0]: other_artist[1]})
+    series_db = conn.execute("SELECT id, name FROM series").fetchall()
+    seriesdict = {}
+    # convert the series to a dict for easy searching
+    for series in series_db:
+        seriesdict.update({series[0]: series[1]})
+    conn.close()
+    response = make_response(render_template(
+        "rss/series.jinja",
+        comics=comics,
+        seriesName=seriesName,
+        artists=artistdict,
+        series=seriesdict,
+        types_map=mimetypes.types_map
+    ))
+    response.headers['Content-Type'] = 'application/xml'
+    return response
 
 @app.route("/create_series", methods=("GET", "POST"))
 @check_token()
@@ -581,6 +671,10 @@ def delete(login_artist: Artist, id):
     flash('"{}" was successfully deleted!'.format(comic["title"]))
     return redirect(url_for("index"))
 
+@app.route("/rss")
+@check_token()
+def rss(login_artist: Artist):
+    return render_template("rss.jinja", login_artist=login_artist)
 
 @app.route("/sitemap.xml")
 def sitemap():

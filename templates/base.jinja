@@ -15,6 +15,7 @@
       <a class="navbar-brand" href="{{ url_for('index')}}">ComicWorld</a> | 
       <a class="nav-link" href="{{url_for('artists')}}">Artists</a> | 
       <a class="nav-link" href="{{url_for('series_list')}}">Series</a> | 
+      <a class="nav-link" href="{{url_for('rss')}}">RSS</a> | 
       {% if login_artist %}
       <a class="nav-link" href="{{url_for('create')}}">Upload Comic</a> | 
       <a class="nav-link" href="{{url_for('create_series')}}">Create Series</a> | 

@@ -19,7 +19,7 @@
         </a>
         {% if comic['seriesid'] %}
         <span class="badge badge-primary">From series: <a
-                href="/series/{{series[comic['seriesid']]}}">{{series[comic['seriesid']] }}</a></span>
+                href="/series/{{series[comic['seriesid']]}}">{{ series[comic['seriesid']] }}</a></span>
         <br>
         {% endif %}
         <span class="badge badge-primary">Created by: <a href="/artists/{{artists[comic['artistid']]}}">{{
