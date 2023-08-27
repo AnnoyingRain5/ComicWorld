@@ -662,6 +662,8 @@ def delete(login_artist: Artist, id):
         "SELECT artistid FROM comics WHERE id = ?", (id,)
     ).fetchone()[0]
     if login_artist.id == artistid:
+        fileext = conn.execute("SELECT fileext FROM comics WHERE id = ?", (id,)).fetchone()[0]
+        os.remove(f"static/comics/{id}.{fileext}")
         conn.execute("DELETE FROM comics WHERE id = ?", (id,))
     else:
         flash("You can't delete other people's comics!")
