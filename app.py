@@ -65,8 +65,6 @@ def check_token(required: bool = False):
                 artist = conn.execute(
                     "SELECT * FROM artists WHERE id = ?", (data["id"],)
                 ).fetchone()
-                print("got here!")
-                print(artist)
             except jwt.exceptions.ExpiredSignatureError as e:
                 if required:
                     flash("Your login has expired! Please log in again")
@@ -626,11 +624,9 @@ def create_account(login_artist: Artist):
             flash("You need an invite code to join!")
         else:
             conn = get_db_connection()
-            print(request.form["code"])
             expired = conn.execute(
                 "SELECT expired FROM codes WHERE code = ?", (request.form["code"],)
             ).fetchone()[0]
-            print(expired)
             if expired == False:
                 passhash = generate_password_hash(request.form["password"])
                 conn.execute(
