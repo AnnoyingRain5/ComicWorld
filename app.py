@@ -769,8 +769,22 @@ def delete_artist(login_artist: Artist):
     artistid = conn.execute(
         "SELECT id FROM artists WHERE username = ?", (username,)
     ).fetchone()[0]
+    comics = conn.execute(
+        "SELECT id, fileext FROM comics WHERE artistid = ?",
+        (artistid,),
+    ).fetchall()
+    for comic in comics:
+        try:
+            os.remove(f"static/comics/{comic[0]}.{comic[1]}")
+        except Exception as e:
+            flash(str(e))
+
     conn.execute(
         "DELETE FROM comics WHERE artistid = ?",
+        (artistid,),
+    )
+    conn.execute(
+        "DELETE FROM series WHERE artistid = ?",
         (artistid,),
     )
     conn.execute(
