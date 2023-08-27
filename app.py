@@ -805,6 +805,7 @@ def delete_artist(login_artist: Artist):
     return redirect(url_for("admin"))
 
 
+@sitemapper.include()
 @app.route("/rss")
 @check_token()
 def rss(login_artist: Artist):
