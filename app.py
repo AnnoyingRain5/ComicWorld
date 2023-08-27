@@ -509,15 +509,23 @@ def create(login_artist: Artist):
                 artistid = cur.execute(
                     "SELECT artistid FROM series WHERE name = ?",
                     (request.form["series"],),
-                ).fetchone()[0]
+                ).fetchone()
+                try:
+                    artistid = artistid[0]
+                except:
+                    artistid = None
                 # if artistid is None, allow anyone to post to the series
                 if login_artist.id != artistid and artistid is not None:
                     flash("You cannot add your comic to someone else's series!")
                     return redirect("/create")
                 # actually add to the database
-                seriesid = cur.execute(
-                    "SELECT id FROM series WHERE name = ?", (request.form["series"],)
-                ).fetchone()[0]
+                if artistid is not None:
+                    seriesid = cur.execute(
+                        "SELECT id FROM series WHERE name = ?",
+                        (request.form["series"],),
+                    ).fetchone()[0]
+                else:
+                    seriesid = None
                 cur.execute(
                     "INSERT INTO comics (title, fileext, artistid, seriesid) VALUES (?, ?, ?, ?)",
                     (title, secure_filename(file.filename.split(".")[-1]), login_artist.id, seriesid),  # type: ignore
