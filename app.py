@@ -564,13 +564,15 @@ def edit_series(login_artist: Artist, SeriesName):
         artistid = conn.execute(
             "SELECT artistid FROM series WHERE name = ?", (SeriesName,)
         ).fetchone()[0]
-        if artistid != login_artist.id:
+        if artistid == login_artist.id or login_artist.isadmin:
+            conn.execute(
+                "UPDATE series SET (name) = (?) WHERE name = ?",
+                (request.form["name"], SeriesName),
+            )
+        else:
             flash("You cannot edit other people's series!")
             return redirect("/series")
-        conn.execute(
-            "UPDATE series SET (name) = (?) WHERE name = ?",
-            (request.form["name"], SeriesName),
-        )
+
         conn.commit()
         conn.close()
         flash("Series updated!")
@@ -588,7 +590,7 @@ def delete_series(login_artist: Artist, SeriesName):
     artistid = conn.execute(
         "SELECT artistid FROM series WHERE name = ?", (SeriesName,)
     ).fetchone()[0]
-    if login_artist.id == artistid:
+    if login_artist.id == artistid or login_artist.isadmin:
         conn.execute("DELETE FROM series WHERE name = ?", (SeriesName,))
     else:
         flash("You can't delete other people's series!")
@@ -612,7 +614,7 @@ def edit(login_artist: Artist, id):
             artistid = conn.execute(
                 "SELECT artistid FROM comics WHERE id = ?", (id,)
             ).fetchone()[0]
-            if login_artist.id == artistid:
+            if login_artist.id == artistid or login_artist.isadmin:
                 # all checks passed, update the database
                 if request.form["series"] != "None":
                     seriesid = conn.execute(
@@ -686,7 +688,7 @@ def delete(login_artist: Artist, id):
     artistid = conn.execute(
         "SELECT artistid FROM comics WHERE id = ?", (id,)
     ).fetchone()[0]
-    if login_artist.id == artistid:
+    if login_artist.id == artistid or login_artist.isadmin:
         fileext = conn.execute(
             "SELECT fileext FROM comics WHERE id = ?", (id,)
         ).fetchone()[0]
