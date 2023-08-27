@@ -10,7 +10,8 @@ CREATE TABLE artists (
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     username TEXT NOT NULL,
     passhash TEXT NOT NULL,
-    isadmin BOOLEAN NOT NULL
+    isadmin BOOLEAN NOT NULL,
+    islocked BOOLEAN NOT NULL DEFAULT 0,
 );
 
 CREATE TABLE series (

@@ -40,10 +40,11 @@ class Artist:
         self.username: str = dbresp[2]
         self.passhash: str = dbresp[3]
         self.isadmin: bool = bool(dbresp[4])
+        self.islocked: bool = bool(dbresp[5])
 
 
 # decorator for verifying the JWT
-def check_token(required: bool = False):
+def check_token(required: bool = False, adminrequired: bool = False):
     def _check_token(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -65,6 +66,17 @@ def check_token(required: bool = False):
                 artist = conn.execute(
                     "SELECT * FROM artists WHERE id = ?", (data["id"],)
                 ).fetchone()
+                if Artist(artist).islocked:
+                    flash(
+                        "Your account has been locked. Please contact AnnoyingRains for assistance."
+                    )
+                    resp = make_response(redirect("/"))
+                    resp.delete_cookie("token")
+                    return resp
+                if adminrequired:
+                    if Artist(artist).isadmin == False:
+                        flash("Only adminstrators can access that page.")
+                        return redirect("/")
             except jwt.exceptions.ExpiredSignatureError as e:
                 if required:
                     flash("Your login has expired! Please log in again")
@@ -168,11 +180,11 @@ def index(login_artist: Artist | None):
         login_artist=login_artist,
     )
 
+
 @app.route("/feed")
 def indexrssfeed():
     conn = get_db_connection()
-    comics = conn.execute(
-        "SELECT * FROM comics ORDER BY created DESC").fetchall()
+    comics = conn.execute("SELECT * FROM comics ORDER BY created DESC").fetchall()
     series_db = conn.execute("SELECT id, name FROM series").fetchall()
     seriesdict = {}
     # convert the series to a dict for easy searching
@@ -184,15 +196,18 @@ def indexrssfeed():
     for other_artist in artists:
         artistdict.update({other_artist[0]: other_artist[1]})
     conn.close()
-    response = make_response(render_template(
-        "rss/index.jinja",
-        comics=comics,
-        series=seriesdict,
-        artists=artistdict,
-        types_map=mimetypes.types_map
-    ))
-    response.headers['Content-Type'] = 'application/xml'
+    response = make_response(
+        render_template(
+            "rss/index.jinja",
+            comics=comics,
+            series=seriesdict,
+            artists=artistdict,
+            types_map=mimetypes.types_map,
+        )
+    )
+    response.headers["Content-Type"] = "application/xml"
     return response
+
 
 @app.route("/<int:comic_id>")
 @check_token()
@@ -270,15 +285,17 @@ def artistrssfeed(artist):
     for other_artist in artists:
         artistdict.update({other_artist[0]: other_artist[1]})
     conn.close()
-    response = make_response(render_template(
-        "rss/artist.jinja",
-        artist=artist,
-        comics=comics,
-        series=seriesdict,
-        artists=artistdict,
-        types_map=mimetypes.types_map
-    ))
-    response.headers['Content-Type'] = 'application/xml'
+    response = make_response(
+        render_template(
+            "rss/artist.jinja",
+            artist=artist,
+            comics=comics,
+            series=seriesdict,
+            artists=artistdict,
+            types_map=mimetypes.types_map,
+        )
+    )
+    response.headers["Content-Type"] = "application/xml"
     return response
 
 
@@ -406,6 +423,7 @@ def series(login_artist: Artist | None, seriesName: str):
         artists=artistdict,
     )
 
+
 @app.route("/series/<string:seriesName>/feed")
 def seriesrssfeed(seriesName):
     conn = get_db_connection()
@@ -427,16 +445,19 @@ def seriesrssfeed(seriesName):
     for series in series_db:
         seriesdict.update({series[0]: series[1]})
     conn.close()
-    response = make_response(render_template(
-        "rss/series.jinja",
-        comics=comics,
-        seriesName=seriesName,
-        artists=artistdict,
-        series=seriesdict,
-        types_map=mimetypes.types_map
-    ))
-    response.headers['Content-Type'] = 'application/xml'
+    response = make_response(
+        render_template(
+            "rss/series.jinja",
+            comics=comics,
+            seriesName=seriesName,
+            artists=artistdict,
+            series=seriesdict,
+            types_map=mimetypes.types_map,
+        )
+    )
+    response.headers["Content-Type"] = "application/xml"
     return response
+
 
 @app.route("/create_series", methods=("GET", "POST"))
 @check_token()
@@ -658,7 +679,9 @@ def delete(login_artist: Artist, id):
         "SELECT artistid FROM comics WHERE id = ?", (id,)
     ).fetchone()[0]
     if login_artist.id == artistid:
-        fileext = conn.execute("SELECT fileext FROM comics WHERE id = ?", (id,)).fetchone()[0]
+        fileext = conn.execute(
+            "SELECT fileext FROM comics WHERE id = ?", (id,)
+        ).fetchone()[0]
         os.remove(f"static/comics/{id}.{fileext}")
         conn.execute("DELETE FROM comics WHERE id = ?", (id,))
     else:
@@ -669,10 +692,102 @@ def delete(login_artist: Artist, id):
     flash('"{}" was successfully deleted!'.format(comic["title"]))
     return redirect(url_for("index"))
 
+
+@app.route("/admin")
+@check_token(required=True, adminrequired=True)
+def admin(login_artist):
+    return render_template("admin_panel.jinja", login_artist=login_artist)
+
+
+@app.route("/admin/create_signup_code", methods=("POST",))
+@check_token(required=True, adminrequired=True)
+def create_signup_code(login_artist: Artist):
+    conn = get_db_connection()
+    code = request.form["code"]
+    conn.execute("INSERT INTO codes (code, expired) VALUES (?, ?)", (code, False))
+    conn.commit()
+    conn.close()
+    flash(f'Signup code "{code}" was successfully created!')
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/create_artist", methods=("POST",))
+@check_token(required=True, adminrequired=True)
+def create_artist(login_artist: Artist):
+    conn = get_db_connection()
+    username = request.form["username"]
+    passhash = generate_password_hash(request.form["password"])
+    try:
+        isadmin = request.form["isadmin"]
+    except:
+        isadmin = False
+    conn.execute(
+        "INSERT INTO artists (username, passhash, isadmin) VALUES (?, ?, ?)",
+        (username, passhash, isadmin),
+    )
+    conn.commit()
+    conn.close()
+    flash(f'Artist "{username}" was successfully created!')
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/lock_artist", methods=("POST",))
+@check_token(required=True, adminrequired=True)
+def lock_artist(login_artist: Artist):
+    conn = get_db_connection()
+    username = request.form["username"]
+    conn.execute(
+        "UPDATE artists SET islocked = 1 WHERE username = ?",
+        (username,),
+    )
+    conn.commit()
+    conn.close()
+    flash(f'Artist "{username}" was successfully locked!')
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/unlock_artist", methods=("POST",))
+@check_token(required=True, adminrequired=True)
+def unlock_artist(login_artist: Artist):
+    conn = get_db_connection()
+    username = request.form["username"]
+    conn.execute(
+        "UPDATE artists SET islocked = 0 WHERE username = ?",
+        (username,),
+    )
+    conn.commit()
+    conn.close()
+    flash(f'Artist "{username}" was successfully unlocked!')
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/delete_artist", methods=("POST",))
+@check_token(required=True, adminrequired=True)
+def delete_artist(login_artist: Artist):
+    conn = get_db_connection()
+    username = request.form["username"]
+    artistid = conn.execute(
+        "SELECT id FROM artists WHERE username = ?", (username,)
+    ).fetchone()[0]
+    conn.execute(
+        "DELETE FROM comics WHERE artistid = ?",
+        (artistid,),
+    )
+    conn.execute(
+        "DELETE FROM artists WHERE id = ?",
+        (artistid,),
+    )
+    conn.commit()
+    conn.close()
+    flash(f'Artist "{username}" was successfully deleted.')
+    return redirect(url_for("admin"))
+
+
 @app.route("/rss")
 @check_token()
 def rss(login_artist: Artist):
     return render_template("rss.jinja", login_artist=login_artist)
+
 
 @app.route("/sitemap.xml")
 def sitemap():
