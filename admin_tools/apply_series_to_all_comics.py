@@ -1,6 +1,6 @@
 import sqlite3
 
-connection = sqlite3.connect("db/database.db")
+connection = sqlite3.connect("../db/database.db")
 artistid = input(
     "Which artist ID should this be for? If none, leave this blank and just hit enter"
 )
