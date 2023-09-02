@@ -1,4 +1,5 @@
 {% extends 'base.jinja' %}
+{% from 'macros/sticky.jinja' import sticky %}
 
 {% block content %}
 <div class="center">
@@ -10,11 +11,8 @@
 
 <div class="notecontainer">
     {% for artist in artists %}
-    <div class="sticky {{['s1','s2', 's3', 's4']|random}}">
-        <a href="{{ url_for('artistpage', artist=artist[0]) }}">
-            <h2>{{ artist[0] }}</h2>
-        </a>
-    </div>
+    {% call sticky(artist[0], url_for('artistpage', artist=artist[0])) %}
+    {% endcall %}
     {% endfor %}
     <!-- This fake element is only here to ensure that the final sticky isn't forced to be an extra row down -->
     <div style="visibility:hidden; height:0px; width: 20em"></div>

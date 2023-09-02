@@ -1,0 +1,17 @@
+{% macro sticky(title, url=none, editable=false) %}
+<div class="sticky {{['s1','s2', 's3', 's4']|random}}" {% if url !=none %} onclick="window.location='{{ url }}'" {%
+    endif %}>
+    {% if url != none %}
+    <a href="{{ url }}">
+        <h2>{{title}}</h2>
+    </a>
+    {% else %}
+    <h2>{{title}}</h2>
+    {% endif %}
+    {{ caller() }}
+    {% if editable %}
+    <a href="{{url}}/edit"><span class="badge badge-warning">Edit</span></a>
+    <br>
+    {% endif %}
+</div>
+{% endmacro %}

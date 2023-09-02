@@ -1,5 +1,5 @@
 {% extends 'base.jinja' %}
-
+{% from 'macros/sticky.jinja' import sticky %}
 {% block content %}
 <div class="center">
     <div class="notepad">
@@ -12,26 +12,20 @@
 </div>
 <div class="notecontainer">
     {% for comic in comics %}
-    <div class="sticky {{['s1','s2', 's3', 's4']|random}}"
-        onclick="window.location='{{ url_for('comic', comic_id=comic['id']) }}'">
-        <a href="{{ url_for('comic', comic_id=comic['id']) }}">
-            <h2>{{ comic['title'] }}</h2>
-        </a>
-        {% if comic['seriesid'] %}
-        <span class="badge badge-primary">From series: <a
-                href="/series/{{series[comic['seriesid']]}}">{{ series[comic['seriesid']] }}</a></span>
-        <br>
-        {% endif %}
-        <span class="badge badge-primary">Created by: <a href="/artists/{{artists[comic['artistid']]}}">{{
-                artists[comic['artistid']] }}</a></span>
-        <br>
-        <span class="badge badge-primary">{{ comic['created'] }}</span>
-        <a href="{{ url_for('edit', id=comic['id']) }}">
-            <span class="badge badge-warning">Edit</span></a>
-        <a href="{{ url_for('comic', comic_id=comic['id']) }}">
-            <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}">
-        </a>
-    </div>
+    {% call sticky(comic['title'], url_for('comic', comic_id=comic['id']), editable=true )%}
+    {% if comic['seriesid'] %}
+    <span class="badge badge-primary">From series: <a href="/series/{{series[comic['seriesid']]}}">{{
+            series[comic['seriesid']] }}</a></span>
+    <br>
+    {% endif %}
+    <span class="badge badge-primary">Created by: <a href="/artists/{{artists[comic['artistid']]}}">{{
+            artists[comic['artistid']] }}</a></span>
+    <br>
+    <span class="badge badge-primary">{{ comic['created'] }}</span>
+    <a href="{{ url_for('comic', comic_id=comic['id']) }}">
+        <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}">
+    </a>
+    {% endcall %}
     {% endfor %}
     <!-- This fake element is only here to ensure that the final sticky isn't forced to be an extra row down -->
     <div style="visibility:hidden; height:0px; width: 20em"></div>
