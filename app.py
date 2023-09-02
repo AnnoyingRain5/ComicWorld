@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 from functools import wraps
 import jwt
-from flask_sitemapper import Sitemapper
+from flask_sitemap import Sitemap
 from datetime import datetime, timedelta
 import upgrade_db
 import mimetypes
@@ -25,6 +25,7 @@ upgrade_db.upgrade_if_needed()
 load_dotenv()
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "tiff", "webp"}
+SITEMAP_URLS = ("index", "login", "artists", "series_list", "rss", "create_account")
 
 
 def get_db_connection():
@@ -125,15 +126,13 @@ if os.getenv("SECRET_KEY") is None:
     print("invalid config!")
     exit()
 
-sitemapper = Sitemapper()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["UPLOAD_FOLDER"] = "static/comics"
 app.config["MAX_LOGIN_TIME"] = int(maxlogintime)
-sitemapper.init_app(app)
+ext = Sitemap(app=app)
 
 
-@sitemapper.include()
 @app.route("/")
 @check_token()
 def index(login_artist: Artist | None):
@@ -305,7 +304,6 @@ def testauth(artist):
     return f"artist: {artist[2]}"
 
 
-@sitemapper.include()
 @app.route("/login", methods=["GET", "POST"])
 @check_token()
 def login(login_artist: Artist | None):
@@ -356,7 +354,6 @@ def logout():
     return resp
 
 
-@sitemapper.include()
 @app.route("/artists")
 @check_token()
 def artists(login_artist: Artist | None):
@@ -366,7 +363,6 @@ def artists(login_artist: Artist | None):
     return render_template("artists.jinja", artists=artists, login_artist=login_artist)
 
 
-@sitemapper.include()
 @app.route("/series")
 @check_token()
 def series_list(login_artist: Artist | None):
@@ -645,7 +641,6 @@ def edit(login_artist: Artist, id):
     )
 
 
-@sitemapper.include()
 @app.route("/create_account", methods=("GET", "POST"))
 @check_token()
 def create_account(login_artist: Artist):
@@ -807,7 +802,6 @@ def delete_artist(login_artist: Artist):
     return redirect(url_for("admin"))
 
 
-@sitemapper.include()
 @app.route("/rss")
 @check_token()
 def rss(login_artist: Artist):
@@ -824,6 +818,19 @@ def toggletheme():
     return resp
 
 
-@app.route("/sitemap.xml")
+@ext.register_generator
 def sitemap():
-    return sitemapper.generate()
+    for page in SITEMAP_URLS:
+        yield page, {}
+    conn = get_db_connection()
+    comics = conn.execute("SELECT id FROM comics ORDER BY created DESC").fetchall()
+    for comic in comics:
+        yield "comic", {"comic_id": comic[0]}
+    artists = conn.execute(
+        "SELECT username FROM artists ORDER BY created DESC"
+    ).fetchall()
+    for artist in artists:
+        yield "artistpage", {"artist": artist[0]}
+    series_db = conn.execute("SELECT name FROM series").fetchall()
+    for series in series_db:
+        yield "series", {"seriesName": series[0]}

@@ -2,4 +2,4 @@ waitress
 flask
 python-dotenv
 pyjwt
-flask_sitemapper
+flask-sitemap
