@@ -814,6 +814,16 @@ def rss(login_artist: Artist):
     return render_template("rss.jinja", login_artist=login_artist)
 
 
+@app.route("/toggletheme")
+def toggletheme():
+    resp = make_response(redirect("/"))
+    if request.cookies.get("darkmode", default=None) is None:
+        resp.set_cookie("darkmode", "true")
+    else:
+        resp.delete_cookie("darkmode")
+    return resp
+
+
 @app.route("/sitemap.xml")
 def sitemap():
     return sitemapper.generate()

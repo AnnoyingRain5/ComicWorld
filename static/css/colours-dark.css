@@ -1,0 +1,51 @@
+.s1 {
+    background-color: #855067;
+    transform: rotate(1deg);
+}
+
+.s1::before {
+    border-color: #643d4e transparent;
+}
+
+.s1::after {
+    border-color: #855067;
+}
+
+.s2 {
+    background-color: #383781;
+    transform: rotate(3deg);
+}
+
+.s2::before {
+    border-color: #424097 transparent;
+}
+
+.s2::after {
+    border-color: #383781;
+}
+
+.s3 {
+    transform: rotate(-1deg);
+    background-color: #807d31;
+}
+
+.s3::before {
+    border-color: #5c5a23 transparent;
+}
+
+.s3::after {
+    border-color: #807d31;
+}
+
+.s4 {
+    transform: rotate(-3deg);
+    background-color: #3d7c47;
+}
+
+.s4::before {
+    border-color: #2d5c35 transparent;
+}
+
+.s4::after {
+    border-color: #3d7c47;
+}
