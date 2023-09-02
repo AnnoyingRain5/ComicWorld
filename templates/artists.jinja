@@ -1,13 +1,9 @@
 {% extends 'base.jinja' %}
 {% from 'macros/sticky.jinja' import sticky %}
+{% from 'macros/notepad.jinja' import notepad %}
 
 {% block content %}
-<div class="center">
-    <div class="notepad">
-        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
-        <h1>{% block title %} Artists: {% endblock %}</h1>
-    </div>
-</div>
+{{ notepad("Artists:") }}
 
 <div class="notecontainer">
     {% for artist in artists %}

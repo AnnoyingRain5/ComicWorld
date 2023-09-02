@@ -1,24 +1,23 @@
 {% extends 'base.jinja' %}
+{% from 'macros/notepad.jinja' import notepad %}
 
 {% block content %}
-<div class="center">
-    <div class="notepad">
-        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
-        <h1>{% block title %}How to use RSS on ComicWorld{% endblock %}</h1>
-        <p>Using RSS on ComicWorld is quite easy, it boils down to just two simple steps:</p>
-        <ol>
-            <li>Go to any of the following:
-                <ul>
-                    <li>Any series page</li>
-                    <li>Any artist page</li>
-                    <li>The home page</li>
-                </ul>
-            </li>
-            <li>Add /feed to the end of the URL, and put that in your RSS reader!</li>
-        </ol>
-        <p>Once you've done that, you should be able to see all of that content in your feed, cool right?</p>
-        <h3>Example:</h3>
-        <p>The feed for an artist named MrMoor2007 would look like this: <a href="https://comicworld.annoyingrains.xyz/artists/MrMoor2007/feed">https://comicworld.annoyingrains.xyz/artists/MrMoor2007/feed</a></p>
-    </div>
-</div>
+{% call notepad("How to use RSS on ComicWorld") %}
+<p>Using RSS on ComicWorld is quite easy, it boils down to just two simple steps:</p>
+<ol>
+    <li>Go to any of the following:
+        <ul>
+            <li>Any series page</li>
+            <li>Any artist page</li>
+            <li>The home page</li>
+        </ul>
+    </li>
+    <li>Add /feed to the end of the URL, and put that in your RSS reader!</li>
+</ol>
+<p>Once you've done that, you should be able to see all of that content in your feed, cool right?</p>
+<h3>Example:</h3>
+<p>The feed for an artist named MrMoor2007 would look like this: <a
+        href="https://comicworld.annoyingrains.xyz/artists/MrMoor2007/feed">https://comicworld.annoyingrains.xyz/artists/MrMoor2007/feed</a>
+</p>
+{% endcall %}
 {% endblock %}

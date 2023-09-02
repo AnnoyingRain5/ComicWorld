@@ -1,16 +1,9 @@
 {% extends 'base.jinja' %}
 {% from 'macros/sticky.jinja' import sticky %}
+{% from 'macros/notepad.jinja' import notepad %}
 
 {% block content %}
-<div class="center">
-    <div class="notepad">
-        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
-        <h1>{% block title %} {{ artist }}'s page {% endblock %}</h1>
-        {% if page - 1 > 0 %} <a href="?page={{page - 1}}">Previous Page</a>{% endif %}{% if page - 1 > 0 and
-        allownext%} |
-        {% endif %}{% if allownext %}<a href="?page={{page + 1}}">Next Page</a> {% endif %}
-    </div>
-</div>
+{{ notepad(artist + "'s page", true, page, allownext) }}
 <div class="notecontainer">
     {% for comic in comics %}
     {% call sticky(comic['title'], url_for('comic', comic_id=comic['id']), editable=true) %}

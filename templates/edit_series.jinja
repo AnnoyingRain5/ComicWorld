@@ -1,29 +1,22 @@
 {% extends 'base.jinja' %}
+{% from 'macros/notepad.jinja' import notepad %}
 {% block content %}
-<div class="center">
-    <div class="notepad">
-        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
-        <h1>{% block title %} Edit a series {% endblock %}</h1>
-        <form method="post" enctype=multipart/form-data>
-            <div class="form-group">
-                <label for="name">Series name</label>
-                <input type="text" name="name" placeholder="Series Name" class="form-control"
-                    value="{{ request.form['name'] }}">
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
+{% call notepad("Edit a series") %}
+<form method="post" enctype=multipart/form-data>
+    <div class="form-group">
+        <label for="name">Series name</label>
+        <input type="text" name="name" placeholder="Series Name" class="form-control"
+            value="{{ request.form['name'] }}">
     </div>
-</div>
-<div class="center">
-    <div class="notepad">
-        <div class="notepad-top"></div>
-        <h3>Or, alternatively, delete it!</h3>
-        <form action="{{ url_for('delete_series', SeriesName=SeriesName) }}" method="POST">
-            <input type="submit" value="Delete Series" class="btn btn-danger btn-sm"
-                onclick="return confirm('Are you sure you want to delete this series?')">
-        </form>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
     </div>
-</div>
+</form>
+{% endcall %}
+{% call notepad("Or, alternatively, delete it!", showpin=false, smalltitle=true) %}
+<form action="{{ url_for('delete_series', SeriesName=SeriesName) }}" method="POST">
+    <input type="submit" value="Delete Series" class="btn btn-danger btn-sm"
+        onclick="return confirm('Are you sure you want to delete this series?')">
+</form>
+{% endcall %}
 {% endblock %}

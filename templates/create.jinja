@@ -1,38 +1,36 @@
 {% extends 'base.jinja' %}
+{% from 'macros/notepad.jinja' import notepad %}
 {% block content %}
-<div class="center">
-    <div class="notepad">
-        <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
-        <h1>{% block title %} Upload a new comic {% endblock %}</h1>
-        <form method="post" enctype=multipart/form-data>
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" name="title" placeholder="Post title" class="form-control"
-                    value="{{ request.form['title'] }}">
-            </div>
 
-            <div class="form-group">
-                <div class="upload-btn-wrapper">
-                    <button class="btn">Choose a file</button>
-                    <br>
-                    <img id="preview" width="50%" style="padding-top: 5%" />
-                    <input type="file" id="image" name="image" accept="image/*"
-                        onchange="document.getElementById('preview').src = window.URL.createObjectURL(this.files[0])">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="series">Series</label>
-                <select name="series" id="series" , style="width: 175px">
-                    <option value="None">No series</option>
-                    {% for series_name in series %}
-                    <option value="{{series_name[0]}}">{{series_name[0]}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
+{% call notepad("Upload a new comic") %}
+<form method="post" enctype=multipart/form-data>
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" name="title" placeholder="Post title" class="form-control"
+            value="{{ request.form['title'] }}">
     </div>
-</div>
+
+    <div class="form-group">
+        <div class="upload-btn-wrapper">
+            <button class="btn">Choose a file</button>
+            <br>
+            <img id="preview" width="50%" style="padding-top: 5%" />
+            <input type="file" id="image" name="image" accept="image/*"
+                onchange="document.getElementById('preview').src = window.URL.createObjectURL(this.files[0])">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="series">Series</label>
+        <select name="series" id="series" , style="width: 175px">
+            <option value="None">No series</option>
+            {% for series_name in series %}
+            <option value="{{series_name[0]}}">{{series_name[0]}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+{% endcall %}
 {% endblock %}
