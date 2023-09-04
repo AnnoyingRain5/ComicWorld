@@ -1,6 +1,7 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
+<title>ComicWorld - {{ comic['title'] }}</title>
 <div class="center">
     <div class="notecontainer">
         <div class="sticky {{['s1','s2', 's3', 's4']|random}}"
