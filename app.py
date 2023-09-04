@@ -808,6 +808,12 @@ def rss(login_artist: Artist):
     return render_template("rss.jinja", login_artist=login_artist)
 
 
+@app.route("/terms-of-service")
+@check_token()
+def tos(login_artist: Artist):
+    return render_template("terms-of-service.jinja", login_artist=login_artist)
+
+
 @app.route("/toggletheme")
 def toggletheme():
     resp = make_response(redirect("/"))

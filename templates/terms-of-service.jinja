@@ -1,0 +1,107 @@
+{% extends 'base.jinja' %}
+{% from 'macros/notepad.jinja' import notepad %}
+
+{% block content %}
+
+{{notepad("Terms of Service")}}
+
+{{notepad("DRAFT! Not yet in effect!", showpin=false)}}
+
+{% call notepad("Introduction", showpin=false, wide=true) %}
+<p>ComicWorld is a website that believes that artists should own their artwork.</p>
+<p>This Terms of Service document has been created to formalise your rights as an artist.</p>
+<p>Essentially, it's designed to make it so I cannot be a dick.</p>
+<p>By posting content to this website, you agree to the following terms:</p>
+{% endcall %}
+
+{% call notepad("Content Ownership", showpin=false, wide=true) %}
+<p>You retain the copyright to all content that you upload to ComicWorld. ComicWorld only has permission to
+    display the content, unless you give explicit written permission to do otherwise.</p>
+{% endcall %}
+{% call notepad("Content Policy") %}
+<p>Content submitted to ComicWorld must fill the following requirements:</p>
+<ul>
+    <li>The content must not harass or demean any group or individual.</li>
+    <li>The content you submit must be your own work, or a result of a collaboration between yourself and another
+        artist, who gave you the rights to publish your work here.</li>
+</ul>
+<p>It is the artist's responsibility to ensure that the content that they submit forfulls these requirements.</p>
+<p>In the event that an artwork breaks this content policy, please reach out to me at: <a
+        href="mailto:contact@annoyingrains.xyz">contact@annoyingrains.xyz</a></p>
+{% call notepad("Use of Content", showpin=false, wide=true) %}
+<p>ComicWorld may use your artwork in marketing materials, subject to the following terms:</p>
+<ul>
+    <li>The artwork must not be the primary aspect of the advertisement.</li>
+    <li>The artwork is only shown as part of a screenshot of the website.</li>
+    <li>The screenshot must not be cropped as such to make the artwork a major part of the advertisement</li>
+    <li>The attribution for the image embedded in the website (username) is not tampered with or removed.
+    </li>
+</ul>
+<p>If you feel that these rights have been violated, you may reach out to me at <a
+        href="mailto:contact@annoyingrains.xyz">contact@annoyingrains.xyz</a>, so the issue can be resolved</p>
+{% endcall %}
+
+{{notepad("DRAFT! Not yet in effect!", showpin=false)}}
+
+{% call notepad("Removal of Content", showpin=false, wide=true)%}
+<p>There are many reasons why content or accounts may need to be removed, terminated or suspended (locked) from
+    ComicWorld.</p>
+<p>ComicWorld may remove content, suspend (lock) or terminate accounts at any time, for any reason.</p>
+<p>In the account that an account is suspended (locked), the user may reach out to me at <a
+        href="mailto:contact@annoyingrains.xyz">contact@annoyingrains.xyz</a> to resolve the situation, or terminate
+    their account</p>
+<p>In all other cases, artists may remove any content for any reason from this site by using either the site's built-in
+    tools, or by contacting me directly at: <a href="mailto:contact@annoyingrains.xyz">contact@annoyingrains.xyz</a></p>
+{% endcall %}
+
+{% call notepad("Copyright Infringement", showpin=false, wide=true) %}
+
+<p>ComicWorld is not responsible for any copyright infringement that may occur on the website. If you
+    believe that your artwork has been infringed upon, please contact me at <a
+        href="mailto:contact@annoyingrains.xyz">contact@annoyingrains.xyz</a> and provide me with the
+    following information:
+</p>
+<ul>
+    <li>The URL of the page where the infringing content is located</li>
+    <li>Evidence that you are the copyright holder of the artwork</li>
+</ul>
+<p>In the event that your artwork that has been published to ComicWorld has been used off-site without your
+    consent, ComicWorld is not responsible, and we may or may not provide assistance in having the content
+    removed.</p>
+<p>In this case, please contact me at <a href="mailto:contact@annoyingrains.xyz">contact@annoyingrains.xyz</a>, and
+    provide the following
+    information:</p>
+<ul>
+    <li>The URL of the page on ComicWorld where the content is hosted</li>
+    <li>The URL of the other website where the content is being used</li>
+    <li>Evidence that you are the copyright holder of the artwork</li>
+</ul>
+{% endcall %}
+
+{{notepad("DRAFT! Not yet in effect!", showpin=false)}}
+
+{% call notepad("Changes to Terms of Service", showpin=false, wide=true) %}
+
+<p>ComicWorld may change the terms of service at any time.</p>
+<p>The most current version of the terms of service
+    will always be posted on the website.</p>
+<p>However, if there are any material changes to the terms of
+    service, we will notify you in advance by contacting you directly and by posting a notice on the website. You will
+    have the opportunity to review the changes before they take effect. By continuing to use ComicWorld after the
+    changes have taken effect, you agree to the new terms.</p>
+{% endcall %}
+
+{% call notepad("Governing Law", showpin=false, wide=true) %}
+
+<p>The laws of Australia will govern these terms of service and any dispute arising out of or relating to
+    them.</p>
+<p>Nothing in this agreement overrides your rights under Australian Consumer law.</p>
+{% endcall %}
+
+{{notepad("DRAFT! Not yet in effect!", showpin=false)}}
+
+{% call notepad("Contact Info", showpin=false, wide=true)%}
+<p>If you have any questions about the terms of service, please contact me at <a
+        href="mailto:contact@annoyingrains.xyz">contact@annoyingrains.xyz</a>.</p>
+{% endcall %}
+{% endblock %}

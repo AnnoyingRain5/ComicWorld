@@ -1,15 +1,15 @@
-{% macro notepad(title, navigation=false, page=0, allownext=false, showpin=true, smalltitle=false) %}
+{% macro notepad(title, navigation=false, page=0, allownext=false, showpin=true, smalltitle=false, wide=false) %}
 <div class="center">
-    <div class="notepad">
+    <div class="notepad" {% if wide %} style="width: 45vw; transform: rotate(0deg); text-align: left;" {% endif%}>
         {% if showpin %}
         <div class="notepad-top"><img class="tack" src="https://yesterweb.org/img/bb/thumbtack.png"></div>
         {% endif %}
         <title>{{ title }}</title>
         {% if smalltitle %}
         <br>
-        <h3>{{title}}</h3>
+        <h3 style="text-align: center">{{title}}</h3>
         {% else %}
-        <h1>{{ title }}</h1>
+        <h1 style="text-align: center">{{ title }}</h1>
         {% endif %}
         {% if navigation %}
         {% if page - 1 > 0 %} <a href="?page={{page - 1}}">Previous Page</a>{% endif %}{% if page - 1 > 0 and
