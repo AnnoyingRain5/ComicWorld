@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS artists;
 DROP TABLE IF EXISTS codes;
 DROP TABLE IF EXISTS series;
 
-PRAGMA user_version = 2;
+PRAGMA user_version = 3;
 
 CREATE TABLE artists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,7 +11,7 @@ CREATE TABLE artists (
     username TEXT NOT NULL,
     passhash TEXT NOT NULL,
     isadmin BOOLEAN NOT NULL,
-    islocked BOOLEAN NOT NULL DEFAULT 0,
+    islocked BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE series (
@@ -19,7 +19,7 @@ CREATE TABLE series (
     name TEXT NOT NULL,
     artistid INTEGER NOT NULL,
     FOREIGN KEY (artistid)
-        REFERENCES artists(id),
+        REFERENCES artists(id)
 );
 
 CREATE TABLE comics (
