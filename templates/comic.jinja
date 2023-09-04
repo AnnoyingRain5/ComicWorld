@@ -1,5 +1,13 @@
 {% extends 'base.jinja' %}
 
+{% block extrahead %}
+<link rel="alternate" type="application/rss+xml" title="All of ComicWorld!" href="/feed" />
+{% if series %}
+<link rel="alternate" type="application/rss+xml" title="Comics in series: {{series}}" href="{{series}}/feed" />
+{% endif %}
+<link rel="alternate" type="application/rss+xml" title="{{artist}}'s feed" href="{{artist}}/feed" />
+{% endblock %}
+
 {% block content %}
 <title>ComicWorld - {{ comic['title'] }}</title>
 <div class="center">
@@ -9,8 +17,12 @@
             <h2>{% block title %} {{ comic['title'] }} {% endblock %}</h2>
             <span class="badge badge-primary">{{ comic['created'] }}</span>
             <a href="/artists/{{artist}}">
-                <span class="badge badge-primary">{{ artist }}</span>
+                <span class="badge badge-primary">Created by: {{ artist }}</span>
             </a>
+            {% if comic['seriesid'] %}
+            <span class="badge badge-primary">From series: <a href="/series/{{series}}">{{ series }}</a></span>
+            <br>
+            {% endif %}
             <br>
             <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}"
                 style="object-fit: contain; height: 69vh; width:70w; border-radius: 10px;">

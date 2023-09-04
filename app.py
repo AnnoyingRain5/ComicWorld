@@ -216,8 +216,18 @@ def comic(login_artist: Artist, comic_id):
     artist = conn.execute(
         "SELECT username FROM artists WHERE id = ?", (comic[4],)
     ).fetchone()
+    if comic["seriesid"]:
+        series = conn.execute(
+            "SELECT name FROM series WHERE id = ?", (comic["seriesid"],)
+        ).fetchone()[0]
+    else:
+        series = None
     return render_template(
-        "comic.jinja", comic=comic, artist=artist[0], login_artist=login_artist
+        "comic.jinja",
+        comic=comic,
+        artist=artist[0],
+        series=series,
+        login_artist=login_artist,
     )
 
 

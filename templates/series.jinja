@@ -2,6 +2,11 @@
 {% from 'macros/sticky.jinja' import sticky %}
 {% from 'macros/notepad.jinja' import notepad %}
 
+{% block extrahead %}
+<link rel="alternate" type="application/rss+xml" title="All of ComicWorld!" href="/feed" />
+<link rel="alternate" type="application/rss+xml" title="Comics in series: {{SeriesName}}" href="{{seriesName}}/feed" />
+{% endblock %}
+
 {% block content %}
 {{ notepad("Series: " + seriesName, navigation=true, page=page, allownext=allownext) }}
 
