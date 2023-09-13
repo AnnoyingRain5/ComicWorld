@@ -250,7 +250,9 @@ def comic(login_artist: Artist, comic_id):
                 "SELECT id FROM comics WHERE artistid = ? AND id < ? ORDER BY id DESC LIMIT 1",
                 (comic["artistid"], comic["id"]),
             ).fetchone()
-        case "" | "index" | _ if referrer is not None and referrer.startswith("?"):
+        case _ if referrer is not None and (
+            referrer.startswith("?") or referrer == "index" or referrer == ""
+        ):
             nextcomic = conn.execute(
                 "SELECT id FROM comics WHERE id > ? LIMIT 1",
                 (comic["id"],),
