@@ -15,11 +15,17 @@
 {% endcall %}
 
 {% call notepad("Content Ownership", showpin=false, wide=true) %}
-<p>You retain the copyright to all content that you upload to ComicWorld. ComicWorld only has permission to
-    display the content, unless you give explicit written permission to do otherwise.</p>
+<p>You retain the copyright to all content that you upload to ComicWorld.</p>
+<p>ComicWorld may only display the content, unless you give explicit written permission to do otherwise.</p>
+<p>It is your responsibility to ensure that your content meets the Content Policy and follows the requirements stated
+    in the Copyright Infringement section of this document.</p>
+<p>
+    The source code of the website itself, excluding any user-generated content uploaded to it, is licensed under the
+    AGPL3, please see the section titled "ComicWorld is free software - AGPL3 notice" for more information about this.
+</p>
 {% endcall %}
 
-{% call notepad("Content Policy") %}
+{% call notepad("Content Policy", showpin=false, wide=true) %}
 <p>Content submitted to ComicWorld must fill the following requirements:</p>
 <ul>
     <li>The content must not harass or demean any group or individual.</li>
@@ -79,6 +85,15 @@
     <li>The URL of the other website where the content is being used</li>
     <li>Evidence that you are the copyright holder of the artwork</li>
 </ul>
+{% endcall %}
+
+{% call notepad("ComicWorld is free software - AGPL3 notice") %}
+<p>The source code for the ComicWorld website is accessible at <a
+        href="https://github.com/AnnoyingRain5/ComicWorld">https://github.com/AnnoyingRain5/ComicWorld</a>, in
+    accordance with the AGPL3 license</p>
+<p>The full text of the AGPL3 is accessible in the file titled COPYING in the link above, and here:
+    <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">https://www.gnu.org/licenses/agpl-3.0.en.html</a>
+</p>
 {% endcall %}
 
 {{notepad("DRAFT! Not yet in effect!", showpin=false)}}
