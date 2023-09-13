@@ -826,7 +826,10 @@ def tos(login_artist: Artist):
 
 @app.route("/toggletheme")
 def toggletheme():
-    resp = make_response(redirect("/"))
+    if request.referrer is not None:
+        resp = make_response(redirect(request.referrer))
+    else:
+        resp = make_response(redirect("/"))
     if request.cookies.get("darkmode", default=None) is None:
         resp.set_cookie("darkmode", "true")
     else:
