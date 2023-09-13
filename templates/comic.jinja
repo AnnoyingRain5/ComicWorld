@@ -29,4 +29,10 @@
         </div>
     </div>
 </div>
+
+<div class="linkbar">
+    {% if previouscomic %} <a href="/{{ previouscomic }}?via={{ referrer }}">Previous Comic</a>{% endif %}
+    {% if previouscomic and nextcomic %}|{% endif %}
+    {% if nextcomic %} <a href="/{{ nextcomic }}?via={{ referrer }}">Next Comic</a>{% endif %}
+</div>
 {% endblock %}
