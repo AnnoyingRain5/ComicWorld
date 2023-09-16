@@ -709,6 +709,11 @@ def edit(login_artist: Artist, id):
 def create_account(login_artist: Artist):
     if request.method == "POST":
         code = request.form["code"]
+        try:
+            request.form["ToS"]
+        except:
+            flash("You must agree to the Terms of Service!")
+            return render_template("create_account.jinja", login_artist=login_artist)
         if not code:
             flash("You need an invite code to join!")
         else:
