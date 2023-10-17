@@ -27,6 +27,8 @@ body {
     color: var(--text-colour);
     background-color: var(--lined-paper-colour);
     background-image: var(--background);
+    position: relative;
+    min-height: 100vh;
 }
 
 label {

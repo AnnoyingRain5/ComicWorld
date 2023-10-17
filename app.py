@@ -19,6 +19,7 @@ from flask_sitemap import Sitemap
 from datetime import datetime, timedelta
 import upgrade_db
 import mimetypes
+import subprocess
 
 upgrade_db.upgrade_if_needed()
 
@@ -131,6 +132,18 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["UPLOAD_FOLDER"] = "static/comics"
 app.config["MAX_LOGIN_TIME"] = int(maxlogintime)
 ext = Sitemap(app=app)
+
+
+@app.context_processor
+def inject_version_info():
+    return dict(
+        COMMIT_ID=subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"]
+        ).decode(),
+        VERSION=subprocess.check_output(
+            ["git", "describe", "--tags", "--abbrev=0"]
+        ).decode(),
+    )
 
 
 @app.route("/")
