@@ -8,6 +8,7 @@ from flask import (
     redirect,
     make_response,
 )
+import requests
 from werkzeug.exceptions import abort
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -126,6 +127,11 @@ else:
 if os.getenv("SECRET_KEY") is None:
     print("invalid config!")
     exit()
+
+if os.getenv("SERVER_ADDRESS") is None:
+    print("invalid config!")
+
+SERVER_ADDRESS = os.getenv("SERVER_ADDRESS")
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
@@ -607,6 +613,25 @@ def create(login_artist: Artist):
                 file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
                 cur.close()
                 conn.close()
+                webhookURL = os.getenv("DISCORD_WEBHOOK_URL")
+                print(webhookURL)
+                if webhookURL is not None:
+                    requests.post(
+                        webhookURL,
+                        json={
+                            "username": login_artist.username,
+                            "embeds": [
+                                {
+                                    "title": title,
+                                    "url": f"{SERVER_ADDRESS}/{cur.lastrowid}",
+                                    "description": "Uploaded a new comic",
+                                    "image": {
+                                        "url": f"{SERVER_ADDRESS}/static/comics/{filename}"
+                                    },
+                                }
+                            ],
+                        },
+                    )
                 return redirect(url_for("index"))
         else:
             flash(
