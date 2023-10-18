@@ -14,7 +14,7 @@
 </form>
 {% endcall %}
 {% call notepad("Or, alternatively, delete it!", showpin=false, smalltitle=true) %}
-<form action="{{ url_for('delete_series', SeriesName=SeriesName) }}" method="POST">
+<form action="{{ url_for('series.delete', SeriesName=SeriesName) }}" method="POST">
     <input type="submit" value="Delete Series" class="btn btn-danger btn-sm"
         onclick="return confirm('Are you sure you want to delete this series?')">
 </form>

@@ -7,9 +7,10 @@
         {% for comic in comics %}
         <item>
             <title>{{ comic['title'] }}</title>
-            <link>https://comicworld.annoyingrains.xyz{{ url_for('comic', comic_id=comic['id']) }}</link>
-            <guid>https://comicworld.annoyingrains.xyz{{ url_for('comic', comic_id=comic['id']) }}</guid>
-            <enclosure url="https://comicworld.annoyingrains.xyz/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}" type="{{ types_map['.' + comic['fileext'].lower()] }}"/>
+            <link>https://comicworld.annoyingrains.xyz{{ url_for('comics.comic', comic_id=comic['id']) }}</link>
+            <guid>https://comicworld.annoyingrains.xyz{{ url_for('comics.comic', comic_id=comic['id']) }}</guid>
+            <enclosure url="https://comicworld.annoyingrains.xyz/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}"
+                type="{{ types_map['.' + comic['fileext'].lower()] }}" />
             <description>A comic by {{ artists[comic['artistid']] }} in the series: {{ series[comic['seriesid']] }}
             </description>
             <pubDate>{{ comic['created'] }}</pubDate>

@@ -10,7 +10,7 @@
 {{ notepad("Welcome to ComicWorld", true, page, allownext) }}
 <div class="notecontainer">
     {% for comic in comics %}
-    {% call sticky(comic['title'], url_for('comic', comic_id=comic['id']), editable=true )%}
+    {% call sticky(comic['title'], url_for('comics.comic', comic_id=comic['id']), editable=true )%}
     {% if comic['seriesid'] %}
     <span class="badge badge-primary">From series: <a href="/series/{{series[comic['seriesid']]}}">{{
             series[comic['seriesid']] }}</a></span>
@@ -20,7 +20,7 @@
             artists[comic['artistid']] }}</a></span>
     <br>
     <span class="badge badge-primary">{{ comic['created'] }}</span>
-    <a href="{{ url_for('comic', comic_id=comic['id']) }}">
+    <a href="{{ url_for('comics.comic', comic_id=comic['id']) }}">
         <img src="/static/comics/{{ comic['id'] }}.{{ comic['fileext'] }}">
     </a>
     {% endcall %}

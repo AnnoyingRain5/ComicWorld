@@ -7,7 +7,7 @@
 
 <div class="notecontainer">
     {% for artist in artists %}
-    {% call sticky(artist[0], url_for('artistpage', artist=artist[0])) %}
+    {% call sticky(artist[0], url_for('artists.artist', artist=artist[0])) %}
     {% endcall %}
     {% endfor %}
     <!-- This fake element is only here to ensure that the final sticky isn't forced to be an extra row down -->

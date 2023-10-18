@@ -25,7 +25,7 @@
 </form>
 {% endcall %}
 {% call notepad("Or, alternatively, delete it!", smalltitle=true, showpin=false)%}
-<form action="{{ url_for('delete', id=comic['id']) }}" method="POST">
+<form action="{{ url_for('comics.delete', id=comic['id']) }}" method="POST">
     <input type="submit" value="Delete Comic" class="btn btn-danger btn-sm"
         onclick="return confirm('Are you sure you want to delete this comic?')">
 </form>
