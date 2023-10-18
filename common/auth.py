@@ -1,4 +1,3 @@
-# decorator for verifying the JWT
 from functools import wraps
 
 from flask import flash, make_response, redirect, request
@@ -7,6 +6,7 @@ from common.db import get_db_connection
 from common.artist import Artist
 
 
+# decorator for verifying the JWT
 def check_token(app, required: bool = False, adminrequired: bool = False):
     def _check_token(f):
         @wraps(f)
