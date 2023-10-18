@@ -34,6 +34,7 @@ SITEMAP_URLS = (
     "series.list",
     "rss",
     "auth.create_account",
+    "tos",
 )
 
 
